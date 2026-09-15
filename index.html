@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Throne of Families and Nations Fellowship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-deep:#0F1B33;
+    --navy:#182A4D;
+    --navy-soft:#24365E;
+    --gold:#C9A438;
+    --gold-soft:#E4CD8B;
+    --cream:#FAF5E9;
+    --cream-dim:#F1E9D6;
+    --burgundy:#6E1F2A;
+    --ink:#1B1B1B;
+    --line: rgba(201,164,56,0.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Source Sans 3', sans-serif;
+    color:var(--ink);
+    background:var(--cream);
+    line-height:1.6;
+  }
+  h1,h2,h3,h4{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    letter-spacing:0.01em;
+  }
+  img{max-width:100%; display:block;}
+  a{color:inherit;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 28px;}
+
+  /* ---------- crest / crown motif ---------- */
+  .crown{
+    width:52px; height:52px;
+    margin:0 auto 18px;
+    display:block;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    background:rgba(15,27,51,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 28px; max-width:1080px; margin:0 auto;
+  }
+  .brand{
+    color:var(--cream); font-family:'Cormorant Garamond',serif;
+    font-size:1.25rem; font-weight:700; letter-spacing:0.02em;
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand svg{width:26px; height:26px; flex-shrink:0;}
+  nav.links{display:flex; gap:28px;}
+  nav.links a{
+    color:var(--cream-dim); text-decoration:none; font-size:0.92rem;
+    border-bottom:1px solid transparent; padding-bottom:2px;
+    transition:border-color .2s;
+  }
+  nav.links a:hover{border-color:var(--gold);}
+  .nav-toggle{display:none; background:none; border:none; color:var(--cream); font-size:1.6rem; cursor:pointer;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    background:
+      radial-gradient(ellipse at top, rgba(201,164,56,0.14), transparent 60%),
+      linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 70%, var(--navy-soft) 100%);
+    color:var(--cream);
+    padding:140px 24px 100px;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(135deg, rgba(201,164,56,0.045) 0 2px, transparent 2px 46px);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative; max-width:720px;}
+  .hero .crown{width:64px; height:64px; opacity:0.95;}
+  .eyebrow-scripture{
+    font-style:italic; color:var(--gold-soft);
+    font-family:'Cormorant Garamond',serif; font-size:1.15rem;
+    max-width:520px; margin:0 auto 22px;
+  }
+  .hero h1{
+    font-size:clamp(2.3rem, 5.4vw, 3.6rem);
+    line-height:1.12;
+    color:#fff;
+    margin-bottom:18px;
+  }
+  .hero h1 em{color:var(--gold-soft); font-style:normal;}
+  .hero p.tagline{
+    font-size:1.1rem; color:var(--cream-dim); max-width:480px; margin:0 auto 36px;
+  }
+  .hero-cta{display:flex; gap:16px; justify-content:center; flex-wrap:wrap;}
+  .btn{
+    display:inline-block; padding:13px 30px; font-size:0.95rem;
+    text-decoration:none; border-radius:2px; font-weight:600;
+    letter-spacing:0.02em; transition:transform .18s, box-shadow .18s;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-gold{background:var(--gold); color:var(--navy-deep);}
+  .btn-gold:hover{box-shadow:0 8px 22px rgba(201,164,56,0.35);}
+  .btn-outline{border:1px solid var(--gold-soft); color:var(--cream);}
+  .btn-outline:hover{background:rgba(255,255,255,0.06);}
+
+  /* ---------- section shell ---------- */
+  section{padding:88px 0;}
+  .section-cream{background:var(--cream);}
+  .section-navy{background:var(--navy-deep); color:var(--cream);}
+  .kicker-rule{
+    width:56px; height:2px; background:var(--gold); margin-bottom:20px;
+  }
+  .section-navy .kicker-rule{background:var(--gold-soft);}
+  h2.section-title{
+    font-size:clamp(1.9rem,3.4vw,2.5rem);
+    margin-bottom:22px; max-width:640px;
+  }
+  .lede{font-size:1.05rem; max-width:600px; color:#3a3a3a;}
+  .section-navy .lede{color:var(--cream-dim);}
+
+  /* ---------- about ---------- */
+  .about-grid{
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:60px; align-items:start;
+  }
+  .about-figure{
+    background:var(--navy);
+    border:1px solid var(--line);
+    aspect-ratio:4/5;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold-soft);
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    text-align:center; padding:30px;
+  }
+
+  /* ---------- service info ---------- */
+  .service-list{list-style:none; margin-top:28px;}
+  .service-list li{
+    display:flex; justify-content:space-between; gap:20px;
+    padding:18px 0; border-bottom:1px solid rgba(0,0,0,0.1);
+    max-width:620px;
+  }
+  .section-navy .service-list li{border-bottom:1px solid rgba(255,255,255,0.12);}
+  .service-list .day{font-weight:600;}
+  .service-list .time{color:var(--gold); font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.05rem;}
+  .venue-note{margin-top:24px; color:#555; max-width:560px;}
+  .section-navy .venue-note{color:var(--cream-dim);}
+
+  /* ---------- gallery ---------- */
+  .gallery-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:36px;
+  }
+  .gallery-grid div{
+    aspect-ratio:1; background:var(--cream-dim);
+    border:1px solid rgba(0,0,0,0.08);
+    display:flex; align-items:center; justify-content:center;
+    color:#9a8a5f; font-size:0.85rem; text-align:center; padding:10px;
+  }
+  .gallery-grid div:nth-child(3n+1){background:#EFE4C6;}
+
+  /* ---------- nations map + brand cards ---------- */
+  .nations-map{
+    margin-top:36px; background:var(--navy);
+    border:1px solid var(--line); padding:10px;
+  }
+  .nations-map svg{width:100%; height:auto; display:block;}
+  .brand-card-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:32px;
+  }
+  .brand-card{
+    background:var(--navy); border:1px solid var(--line);
+    border-top:2px solid var(--gold); padding:26px 22px;
+    text-align:center;
+  }
+  .brand-card-crown{width:30px; height:30px; margin:0 auto 14px;}
+  .brand-card-label{
+    font-size:0.78rem; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--gold-soft); margin-bottom:14px;
+  }
+  .brand-card-quote{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:1.1rem; color:#fff; margin-bottom:12px;
+  }
+  .brand-card-body{color:var(--cream-dim); font-size:1rem; line-height:1.7;}
+  .brand-card-ref{font-size:0.82rem; color:var(--gold-soft);}
+
+  /* ---------- testimonials & healing ---------- */
+  .quote-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:32px; margin-top:40px;
+  }
+  .quote-card{
+    background:var(--navy);
+    border-left:3px solid var(--gold);
+    padding:30px 28px;
+  }
+  .quote-card p{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:1.2rem; color:var(--cream); margin-bottom:16px;
+  }
+  .quote-card .who{font-size:0.85rem; color:var(--gold-soft); letter-spacing:0.02em;}
+
+  .healing-band{
+    background:var(--burgundy); color:var(--cream);
+    padding:64px 0;
+  }
+  .healing-inner{
+    display:grid; grid-template-columns:1fr 1fr; gap:50px; align-items:center;
+  }
+  .healing-inner .lede{color:#F0DCDF;}
+  .healing-form{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(228,205,139,0.3);
+    padding:28px;
+  }
+  .healing-form p{font-size:0.92rem; color:#F0DCDF; margin-bottom:18px;}
+  .healing-form textarea{
+    width:100%; min-height:96px; background:rgba(255,255,255,0.08);
+    border:1px solid rgba(228,205,139,0.35); color:#fff;
+    padding:12px; font-family:inherit; font-size:0.92rem; resize:vertical;
+    margin-bottom:14px;
+  }
+  .healing-form textarea::placeholder{color:rgba(255,255,255,0.5);}
+
+  /* ---------- prayer line ---------- */
+  .prayer-line{
+    background:var(--gold-soft);
+    padding:70px 0; text-align:center;
+  }
+  .prayer-line h2{color:var(--navy-deep); max-width:600px; margin:0 auto 14px;}
+  .prayer-line p{max-width:480px; margin:0 auto 28px; color:#4a3f22;}
+
+  .floating-whatsapp{
+    position:fixed; bottom:22px; right:22px; z-index:60;
+    background:#1E7A46; color:#fff;
+    width:58px; height:58px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 22px rgba(0,0,0,0.25);
+    text-decoration:none;
+  }
+  .floating-whatsapp svg{width:28px; height:28px;}
+
+  /* ---------- contact ---------- */
+  .contact-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:50px;
+  }
+  .contact-item{margin-bottom:22px;}
+  .contact-item .label{
+    font-size:0.78rem; letter-spacing:0.04em; color:var(--gold-soft);
+    text-transform:uppercase; margin-bottom:4px;
+  }
+  .map-box{
+    background:var(--navy); border:1px solid var(--line);
+    aspect-ratio:4/3; display:flex; align-items:center; justify-content:center;
+    color:var(--cream-dim); font-style:italic; font-family:'Cormorant Garamond',serif;
+  }
+  .social-row{display:flex; gap:16px; margin-top:20px;}
+  .social-row a{
+    width:40px; height:40px; border:1px solid var(--gold-soft); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold-soft); text-decoration:none; font-size:0.85rem;
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    background:var(--navy-deep); color:rgba(255,255,255,0.55);
+    text-align:center; padding:26px 20px; font-size:0.82rem;
+    border-top:1px solid var(--line);
+  }
+  footer a{color:var(--gold-soft); text-decoration:none;}
+
+  @media (max-width:820px){
+    nav.links{display:none;}
+    .about-grid, .healing-inner, .contact-grid{grid-template-columns:1fr; gap:36px;}
+    .quote-grid{grid-template-columns:1fr;}
+    .gallery-grid{grid-template-columns:repeat(2,1fr);}
+    .brand-card-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 34L10 16L18 24L24 10L30 24L38 16L42 34H6Z" stroke="#C9A438" stroke-width="2" stroke-linejoin="round"/>
+        <rect x="6" y="34" width="36" height="4" stroke="#C9A438" stroke-width="2"/>
+      </svg>
+      Throne of Families &amp; Nations
+    </div>
+    <nav class="links">
+      <a href="#about">About</a>
+      <a href="#service">Services</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#updates">Latest Updates</a>
+      <a href="/blog/index.html">Blog</a>
+      <a href="#healing">Healing &amp; Prayers</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <svg class="crown" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 34L10 16L18 24L24 10L30 24L38 16L42 34H6Z" stroke="#E4CD8B" stroke-width="1.6" stroke-linejoin="round"/>
+      <rect x="6" y="34" width="36" height="4" stroke="#E4CD8B" stroke-width="1.6"/>
+      <circle cx="24" cy="10" r="1.6" fill="#E4CD8B"/>
+    </svg>
+    <p class="eyebrow-scripture">&ldquo;All the ends of the world shall remember and turn to the Lord, and all the families of the nations shall worship before You.&rdquo; &mdash; Psalm 22:27, NKJV</p>
+    <h1>Throne of Families<br>and <em>Nations Fellowship</em></h1>
+    <p class="tagline">A house of prayer for every family and every nation &mdash; come as you are, and be welcomed home.</p>
+    <div class="hero-cta">
+      <a href="#service" class="btn btn-gold">Plan Your Visit</a>
+      <a href="https://wa.me/260000000000" class="btn btn-outline" target="_blank" rel="noopener">Join the Prayer Line</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section-cream" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <div class="kicker-rule"></div>
+      <h2 class="section-title">A fellowship built on family, faith, and belonging</h2>
+      <p class="lede">Throne of Families and Nations Fellowship exists to gather households from every background into one body of worship, prayer, and mutual care. We believe the local church is where nations begin to heal &mdash; one family at a time.</p>
+      <p class="lede" style="margin-top:18px;">Under the leadership of our pastoral team, we hold weekly services, prayer meetings, and community gatherings rooted in Scripture, hospitality, and honest fellowship. [Replace with the Fellowship's own vision &amp; leadership write-up.]</p>
+    </div>
+    <div class="about-figure">
+      Leadership / crest photograph placeholder
+    </div>
+  </div>
+</section>
+
+<!-- SERVICE INFO -->
+<section class="section-navy" id="service">
+  <div class="wrap">
+    <div class="kicker-rule"></div>
+    <h2 class="section-title">Join us this week</h2>
+    <p class="lede">All are welcome, family and friends alike. We currently gather virtually via Google Meet &mdash; join through our official WhatsApp Prayer Line group for the link.</p>
+    <ul class="service-list">
+      <li><span class="day">Monday Evening Session</span><span class="time">21:00 &ndash; 22:30 HRS</span></li>
+      <li><span class="day">Wednesday Evening Session</span><span class="time">21:00 &ndash; 22:30 HRS</span></li>
+      <li><span class="day">Friday Evening Session</span><span class="time">21:00 &ndash; 22:30 HRS</span></li>
+    </ul>
+    <p class="venue-note">We meet online via Google Meet. Our official WhatsApp group has been active for years and is the fastest way to get the link and stay connected &mdash; join via the Prayer Line button below.</p>
+  </div>
+
+</section>
+
+<!-- GALLERY -->
+<section class="section-navy" id="gallery">
+  <div class="wrap">
+    <div class="kicker-rule" style="background:var(--gold-soft);"></div>
+    <h2 class="section-title" style="color:#fff;">Nations Represented</h2>
+    <p class="lede">We gather online, so our fellowship isn't bound to one city &mdash; families join us from across the map. Here's where we've gathered from so far. <span style="opacity:0.7;">(Illustrative &mdash; to be updated once we confirm every member's location.)</span></p>
+
+    <div class="nations-map">
+      <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
+            <circle cx="1.4" cy="1.4" r="1.4" fill="#3A4C77"/>
+          </pattern>
+        </defs>
+        <!-- simplified world silhouette, dotted fill, matching the poster's world-map motif -->
+        <g fill="url(#dots)">
+          <path d="M120 150 L260 120 L340 160 L300 220 L200 240 L140 210 Z"/>
+          <path d="M420 110 L620 90 L760 130 L740 200 L560 220 L440 190 Z"/>
+          <path d="M480 250 L580 240 L610 340 L540 400 L470 340 Z"/>
+          <path d="M700 260 L820 250 L860 330 L780 370 L710 330 Z"/>
+          <path d="M160 260 L260 260 L280 340 L190 360 Z"/>
+        </g>
+        <!-- pins: placeholder locations -->
+        <g font-family="'Source Sans 3',sans-serif" font-size="15" fill="#E4CD8B">
+          <circle cx="240" cy="180" r="6" fill="#C9A438"/><text x="252" y="185">Zambia</text>
+          <circle cx="480" cy="150" r="6" fill="#C9A438"/><text x="492" y="155">United Kingdom</text>
+          <circle cx="330" cy="190" r="6" fill="#C9A438"/><text x="342" y="195">South Africa</text>
+          <circle cx="250" cy="230" r="6" fill="#C9A438"/><text x="262" y="235">Zimbabwe</text>
+          <circle cx="150" cy="230" r="6" fill="#C9A438"/><text x="162" y="235">USA</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="brand-card-grid">
+      <div class="brand-card">
+        <svg class="brand-card-crown" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 34L10 16L18 24L24 10L30 24L38 16L42 34H6Z" stroke="#C9A438" stroke-width="1.6" stroke-linejoin="round"/>
+          <rect x="6" y="34" width="36" height="4" stroke="#C9A438" stroke-width="1.6"/>
+        </svg>
+        <p class="brand-card-quote">&ldquo;All the ends of the world shall remember and turn to the Lord, and all the families of the nations shall worship before You.&rdquo;</p>
+        <div class="brand-card-ref">Psalm 22:27, NKJV</div>
+      </div>
+      <div class="brand-card">
+        <div class="brand-card-label">Session Times</div>
+        <p class="brand-card-body">Monday, Wednesday &amp; Friday<br>21:00 &ndash; 22:30 HRS<br>via Google Meet</p>
+      </div>
+      <div class="brand-card">
+        <div class="brand-card-label">Testimony Highlight</div>
+        <p class="brand-card-body">&ldquo;Even meeting online, this fellowship became a second family to me and my children.&rdquo;</p>
+        <div class="brand-card-ref">&mdash; Member testimony, placeholder</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LATEST UPDATES (BLOG PREVIEW) -->
+<section class="section-cream" id="updates">
+  <div class="wrap">
+    <div class="kicker-rule"></div>
+    <h2 class="section-title">Latest Updates</h2>
+    <p class="lede">News and reflections from the fellowship &mdash; read more on our Blog.</p>
+    <div id="latest-updates-grid" class="gallery-grid" style="grid-template-columns:repeat(3,1fr); margin-top:36px;">
+      <div>Loading updates&hellip;</div>
+    </div>
+    <div style="margin-top:32px;">
+      <a href="/blog/index.html" class="btn btn-gold" style="background:var(--navy-deep); color:#fff;">Visit the Blog</a>
+    </div>
+  </div>
+</section>
+<script>
+  fetch('/blog/latest.json')
+    .then(r => r.json())
+    .then(posts => {
+      const grid = document.getElementById('latest-updates-grid');
+      if (!posts.length) { grid.innerHTML = '<p>No posts yet &mdash; check back soon.</p>'; return; }
+      grid.style.display = 'grid';
+      grid.innerHTML = posts.map(p => `
+        <a href="/blog/posts/${p.slug}.html" style="text-align:left; text-decoration:none; color:inherit; background:#fff; border-left:3px solid var(--gold); padding:18px; aspect-ratio:auto;">
+          <div style="font-size:0.78rem; color:#8a7a4a; margin-bottom:6px;">${p.date}</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--navy-deep); margin-bottom:6px;">${p.title}</div>
+          <div style="font-size:0.9rem; color:#444;">${p.excerpt}</div>
+        </a>`).join('');
+    })
+    .catch(() => {
+      document.getElementById('latest-updates-grid').innerHTML = '<p>Updates will appear here once posts are published.</p>';
+    });
+</script>
+
+<!-- TESTIMONIALS -->
+<section class="section-navy">
+  <div class="wrap">
+    <div class="kicker-rule"></div>
+    <h2 class="section-title">What our members say</h2>
+    <div class="quote-grid">
+      <div class="quote-card">
+        <p>&ldquo;This fellowship became a second family to me and my children. We found belonging here.&rdquo;</p>
+        <div class="who">&mdash; Member testimony, placeholder</div>
+      </div>
+      <div class="quote-card">
+        <p>&ldquo;The teaching and the prayer life of this church have carried my household through hard seasons.&rdquo;</p>
+        <div class="who">&mdash; Member testimony, placeholder</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HEALING & PRAYERS -->
+<section class="healing-band" id="healing">
+  <div class="wrap healing-inner">
+    <div>
+      <div class="kicker-rule" style="background:#E4CD8B;"></div>
+      <h2 class="section-title" style="color:#fff;">Healing &amp; Prayers</h2>
+      <p class="lede">We serve a God who still heals and still answers prayer. Below are a few testimonies from families in our fellowship &mdash; and an open door for you to bring your own request.</p>
+      <div class="quote-card" style="margin-top:28px; border-left-color:#E4CD8B; background:rgba(255,255,255,0.07);">
+        <p>&ldquo;After months of prayer with the fellowship, my father's health was restored. We give God the glory.&rdquo;</p>
+        <div class="who">&mdash; Healing testimony, placeholder</div>
+      </div>
+    </div>
+    <div class="healing-form">
+      <p>Submit a healing or prayer request &mdash; our prayer team will hold it with you.</p>
+      <textarea placeholder="Share what you'd like us to pray for..."></textarea>
+      <a href="https://wa.me/260000000000" class="btn btn-gold" target="_blank" rel="noopener" style="width:100%; text-align:center;">Send via WhatsApp Prayer Line</a>
+    </div>
+  </div>
+</section>
+
+<!-- PRAYER LINE CTA -->
+<section class="prayer-line">
+  <div class="wrap">
+    <h2 class="section-title" style="margin:0 auto 14px;">Need prayer right now?</h2>
+    <p>Reach our Prayer Line directly on WhatsApp &mdash; one tap, any time.</p>
+    <a href="https://wa.me/260000000000" class="btn" style="background:var(--navy-deep); color:#fff;" target="_blank" rel="noopener">Join the Prayer Line</a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section-navy" id="contact">
+  <div class="wrap contact-grid">
+    <div>
+      <div class="kicker-rule"></div>
+      <h2 class="section-title">Find us</h2>
+      <div class="contact-item">
+        <div class="label">WhatsApp Prayer Line</div>
+        <div>Phone number coming soon &mdash; join our official WhatsApp group below in the meantime.</div>
+      </div>
+      <div class="contact-item">
+        <div class="label">Email</div>
+        <div>info@throneoffamiliesandnations.org</div>
+      </div>
+      <div class="contact-item">
+        <div class="label">Where We Meet</div>
+        <div>Online, via Google Meet &mdash; join through our WhatsApp group for the session link.</div>
+      </div>
+      <div class="social-row">
+        <a href="https://wa.me/260000000000" target="_blank" rel="noopener" aria-label="WhatsApp group">WA</a>
+        <a href="#" aria-label="Facebook">FB</a>
+      </div>
+    </div>
+    <div class="map-box">Google Meet session &mdash; join via WhatsApp for the link</div>
+  </div>
+</section>
+
+<footer>
+  Built and maintained by <a href="#" target="_blank" rel="noopener">Nexus Digital Solutions</a>
+</footer>
+
+<a class="floating-whatsapp" href="https://wa.me/260000000000" target="_blank" rel="noopener" aria-label="Join the Prayer Line on WhatsApp">
+  <svg viewBox="0 0 32 32" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 3C9.4 3 4 8.4 4 15c0 2.3.6 4.4 1.7 6.3L4 29l7.9-1.6c1.8.9 3.9 1.4 6.1 1.4 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.7c-2 0-3.9-.5-5.5-1.5l-.4-.2-4.7 1 1-4.6-.2-.4C5.3 17.1 4.9 16 4.9 15c0-6.1 5-11.1 11.1-11.1S27.1 8.9 27.1 15 22.1 24.7 16 24.7zm6.1-8.3c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2-.2.3-.9 1.1-1.1 1.3-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.7-1.7-1-.9-1.7-2-1.9-2.3-.2-.3 0-.5.1-.7.1-.1.3-.4.5-.5.2-.2.2-.3.3-.5.1-.2 0-.4 0-.6 0-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8 0 1.7 1.2 3.3 1.4 3.5.2.2 2.4 3.7 5.8 5.1.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 2-.8 2.3-1.6.3-.8.3-1.4.2-1.6-.1-.1-.3-.2-.6-.4z"/>
+  </svg>
+</a>
+
+</body>
+</html>

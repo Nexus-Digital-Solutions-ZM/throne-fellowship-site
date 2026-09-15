@@ -1,0 +1,30 @@
+backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/YOUR-REPO-NAME
+  branch: main
+  base_url: https://YOUR-VERCEL-PROJECT.vercel.app
+  auth_endpoint: api/auth
+
+# GitHub OAuth backend (Vercel-friendly, no Netlify involved).
+# Set up: create a GitHub OAuth App -> add its Client ID/Secret as Vercel env vars
+# (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET) -> the /api/auth and /api/callback
+# serverless functions in this repo handle the login handshake.
+# base_url must match your live Vercel domain (or custom domain once attached).
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+publish_mode: simple
+
+collections:
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "content/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Cover Image", name: "image", widget: "image", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "text", hint: "1-2 sentences shown in the Latest Updates preview and blog listing." }
+      - { label: "Body", name: "body", widget: "markdown" }

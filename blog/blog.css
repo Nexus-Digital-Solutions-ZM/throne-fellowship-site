@@ -1,0 +1,30 @@
+:root{
+  --navy-deep:#0F1B33; --navy:#182A4D; --gold:#C9A438; --gold-soft:#E4CD8B;
+  --cream:#FAF5E9; --cream-dim:#F1E9D6; --ink:#1B1B1B;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:'Source Sans 3', sans-serif; background:var(--cream); color:var(--ink); line-height:1.65;}
+h1,h2{font-family:'Cormorant Garamond', serif; font-weight:600;}
+.wrap{max-width:760px; margin:0 auto; padding:60px 28px 100px;}
+.blog-header{background:var(--navy-deep); padding:16px 28px;}
+.blog-header .brand{color:var(--cream); text-decoration:none; font-family:'Cormorant Garamond',serif; font-size:1.1rem;}
+h1{font-size:2.4rem; color:var(--navy-deep); margin-bottom:10px;}
+.lede{color:#555; margin-bottom:40px;}
+.post-grid{display:flex; flex-direction:column; gap:26px;}
+.post-card{
+  display:block; text-decoration:none; color:inherit;
+  border-left:3px solid var(--gold); padding:18px 22px; background:#fff;
+}
+.post-card .post-date{font-size:0.8rem; color:#8a7a4a; margin-bottom:6px;}
+.post-card h2{font-size:1.5rem; color:var(--navy-deep); margin-bottom:8px;}
+.post-card p{color:#444; margin-bottom:10px;}
+.post-card .read-more{color:var(--gold); font-weight:600; font-size:0.9rem;}
+.back-link{display:inline-block; margin-bottom:24px; color:var(--navy); text-decoration:none; font-size:0.9rem;}
+.post-page .post-date{color:#8a7a4a; font-size:0.85rem; margin-bottom:8px;}
+.post-page h1{margin-bottom:20px;}
+.post-body{font-size:1.05rem; color:#222;}
+.post-body p{margin-bottom:16px;}
+.blog-footer{
+  background:var(--navy-deep); color:rgba(255,255,255,0.55);
+  text-align:center; padding:26px 20px; font-size:0.82rem;
+}
