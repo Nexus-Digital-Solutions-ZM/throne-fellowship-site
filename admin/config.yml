@@ -1,8 +1,8 @@
 backend:
   name: github
-  repo: YOUR-GITHUB-USERNAME/YOUR-REPO-NAME
+  repo: Nexus-Digital-Solutions-ZM/throne-fellowship-site
   branch: main
-  base_url: https://YOUR-VERCEL-PROJECT.vercel.app
+  base_url: https://throneoffamiliesandnations.org
   auth_endpoint: api/auth
 
 # GitHub OAuth backend (Vercel-friendly, no Netlify involved).
