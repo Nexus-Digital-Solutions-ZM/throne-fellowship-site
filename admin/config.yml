@@ -28,3 +28,20 @@ collections:
       - { label: "Cover Image", name: "image", widget: "image", required: false }
       - { label: "Excerpt", name: "excerpt", widget: "text", hint: "1-2 sentences shown in the Latest Updates preview and blog listing." }
       - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "testimonies"
+    label: "Testimonies"
+    folder: "content/testimonies"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Person (optional, may withhold)", name: "name", widget: "string", required: false }
+      - { label: "Date Received", name: "date", widget: "datetime" }
+      - { label: "Testimony Screenshot / Photo", name: "image", widget: "image", required: false }
+      - { label: "Testimony Text", name: "body", widget: "text", hint: "Quote or summary of the testimony, in the sender's own words where possible." }
+    # Note: new entries here are stored as markdown in content/testimonies/.
+    # The Testimonies page (testimonies.html) is currently a static, hand-curated
+    # page with real submitted testimonies already built in. Wiring this collection
+    # into an auto-rendered feed on that page (the same way scripts/build-blog.js
+    # renders the blog) is the natural next step once you want new testimonies to
+    # publish without a code change.
