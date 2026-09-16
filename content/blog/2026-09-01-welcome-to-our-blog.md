@@ -1,9 +1,9 @@
 ---
 title: Welcome to Our Blog
-date: 2026-09-01
+date: 2026-09-16T10:33:00.000+02:00
 image: ""
-excerpt: A new space to share what God is doing among our families and nations.
+excerpt: "Website "
 ---
-We're glad to open this space as a place to share testimonies, service updates, and reflections from our fellowship. Check back often, or join our WhatsApp Prayer Line to stay connected in between posts.
 
-God bless you 🙏🏾
+
+God bless you happy to announce out website
