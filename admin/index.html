@@ -9,6 +9,22 @@
   </style>
 </head>
 <body>
+  <script>
+    // Mobile OAuth relay: if api/callback.js stashed a login message because
+    // window.opener wasn't available, replay it now that Decap CMS is about
+    // to mount and can attach its own listener for it.
+    (function() {
+      var relayed = sessionStorage.getItem('decap-cms-oauth-relay');
+      if (!relayed) return;
+      sessionStorage.removeItem('decap-cms-oauth-relay');
+      function fireRelay(attempt) {
+        window.postMessage(relayed, window.location.origin);
+        if (attempt < 5) setTimeout(function() { fireRelay(attempt + 1); }, 500);
+      }
+      // Give Decap CMS a moment to mount and attach its own listener.
+      setTimeout(function() { fireRelay(0); }, 800);
+    })();
+  </script>
   <!-- Decap CMS (free, open-source, git-based — no server for Nexus to run) -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
