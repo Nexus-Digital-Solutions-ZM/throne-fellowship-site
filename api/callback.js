@@ -1,5 +1,9 @@
 // /api/callback — step 2 of the CMS login. GitHub sends the admin back here with a
-// one-time code; we exchange it for an access token and post it to the CMS popup.
+// one-time code; we exchange it for an access token and post it to the CMS.
+// On desktop this goes through the normal popup + postMessage flow. On mobile,
+// where window.opener is often unavailable because the browser collapses the
+// popup into a regular tab, we fall back to sessionStorage + a redirect back
+// to /admin/, which replays the message once the CMS has mounted.
 module.exports = async (req, res) => {
   const { code } = req.query;
   const clientId = process.env.OAUTH_CLIENT_ID;
@@ -20,21 +24,28 @@ module.exports = async (req, res) => {
 
     const token = tokenData.access_token;
     const payload = JSON.stringify({ token, provider: "github" });
+    const message = `authorization:github:success:${payload.replace(/'/g, "\\'")}`;
 
-    // Decap CMS listens for this exact postMessage format in the popup it opened.
     res.setHeader("Content-Type", "text/html");
     res.status(200).send(`
       <script>
         (function() {
-          function receiveMessage(e) {
-            window.opener.postMessage(
-              'authorization:github:success:${payload.replace(/'/g, "\\'")}',
-              e.origin
-            );
-            window.removeEventListener("message", receiveMessage, false);
+          var message = '${message}';
+
+          if (window.opener) {
+            // Desktop popup flow — unchanged.
+            function receiveMessage(e) {
+              window.opener.postMessage(message, e.origin);
+              window.removeEventListener("message", receiveMessage, false);
+            }
+            window.addEventListener("message", receiveMessage, false);
+            window.opener.postMessage("authorizing:github", "*");
+          } else {
+            // Mobile fallback: no popup relationship exists. Stash the
+            // message and hand off back to /admin/, which replays it.
+            sessionStorage.setItem('decap-cms-oauth-relay', message);
+            window.location.replace('/admin/');
           }
-          window.addEventListener("message", receiveMessage, false);
-          window.opener.postMessage("authorizing:github", "*");
         })();
       </script>
     `);
