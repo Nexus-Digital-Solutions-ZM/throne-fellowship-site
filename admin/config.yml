@@ -39,9 +39,7 @@ collections:
       - { label: "Date Received", name: "date", widget: "datetime" }
       - { label: "Testimony Screenshot / Photo", name: "image", widget: "image", required: false }
       - { label: "Testimony Text", name: "body", widget: "text", hint: "Quote or summary of the testimony, in the sender's own words where possible." }
-    # Note: new entries here are stored as markdown in content/testimonies/.
-    # The Testimonies page (testimonies.html) is currently a static, hand-curated
-    # page with real submitted testimonies already built in. Wiring this collection
-    # into an auto-rendered feed on that page (the same way scripts/build-blog.js
-    # renders the blog) is the natural next step once you want new testimonies to
-    # publish without a code change.
+    # Entries here are stored as markdown in content/testimonies/ and rendered
+    # into testimonies.html by scripts/build-testimonies.js on every deploy
+    # (same pattern as the blog). Newest first, by "Date Received".
+    # Nothing else needs doing - publish here and it appears on the site.

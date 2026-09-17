@@ -189,6 +189,8 @@ h2.section-title{font-size:clamp(1.9rem,3.4vw,2.5rem); margin-bottom:22px; max-w
 .testimony-card{background:var(--navy); border:1px solid var(--line); border-left:3px solid var(--gold); overflow:hidden;}
 .testimony-card img{width:100%; display:block; border-bottom:1px solid var(--line);}
 .testimony-card .cap{padding:16px 18px; font-size:0.88rem; color:var(--cream-dim);}
+.testimony-card .who{padding:0 18px 16px; font-size:0.82rem; color:var(--gold-soft); letter-spacing:0.02em;}
+.testimony-card .cap + .who{margin-top:-4px;}
 .quote-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:32px; margin-top:40px;}
 .quote-card{background:var(--navy); border-left:3px solid var(--gold); padding:30px 28px;}
 .quote-card p{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.2rem; color:var(--cream); margin-bottom:16px;}
@@ -243,3 +245,27 @@ footer a{color:var(--gold-soft); text-decoration:none;}
   .link-card-grid{grid-template-columns:repeat(2,1fr);}
   .brand-card-grid{grid-template-columns:1fr;}
 }
+
+/* ---- small-screen hardening ---- */
+/* stop long words, URLs and email addresses from pushing the layout sideways */
+body{overflow-wrap:break-word; word-wrap:break-word;}
+
+@media (max-width:560px){
+  .wrap{padding:0 20px;}
+  .nav{padding:14px 20px;}
+  nav.links a{padding:14px 20px;}
+  section{padding:60px 0;}
+  .page-banner{padding:130px 20px 54px;}
+  .hero{padding:130px 20px 80px;}
+  /* day/time stack instead of colliding on narrow screens */
+  .service-list li{flex-direction:column; gap:2px;}
+  /* full-width buttons read better on a phone */
+  .hero-cta{flex-direction:column; align-items:stretch;}
+  .hero-cta .btn{text-align:center;}
+  /* keep the floating WhatsApp button clear of the footer text */
+  footer{padding-bottom:90px;}
+  .social-row a{flex:1 1 auto;}
+}
+
+/* testimony screenshots vary in height - cap them so cards stay even */
+.testimony-card img{max-height:520px; object-fit:contain; background:var(--navy-deep);}

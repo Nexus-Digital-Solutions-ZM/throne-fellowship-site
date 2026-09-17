@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "node scripts/build-blog.js"
+    "build": "node scripts/build-blog.js && node scripts/build-testimonies.js",
+    "migrate:testimonies": "node scripts/extract-testimonies.js"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
