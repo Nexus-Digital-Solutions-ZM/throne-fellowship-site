@@ -227,7 +227,23 @@ h2.section-title{font-size:clamp(1.9rem,3.4vw,2.5rem); margin-bottom:22px; max-w
   color:var(--gold-soft); text-decoration:none; font-size:0.85rem;
 }
 .social-row a:hover{background:rgba(255,255,255,0.06);}
-.map-box{background:var(--navy); border:1px solid var(--line); aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; color:var(--cream-dim); font-style:italic; font-family:'Cormorant Garamond',serif; text-align:center; padding:24px;}
+.meet-box{
+  background:var(--navy); border:1px solid var(--line); aspect-ratio:4/3;
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:32px 24px;
+}
+.meet-box::before{
+  content:""; position:absolute; inset:0;
+  background:radial-gradient(circle at 50% 38%, rgba(201,164,56,0.16), transparent 65%);
+  pointer-events:none;
+}
+.meet-box svg{width:150px; height:auto; margin-bottom:20px; position:relative;}
+.meet-box .meet-label{
+  position:relative; font-family:'Cormorant Garamond',serif; font-style:italic;
+  color:var(--cream-dim); font-size:1.05rem; line-height:1.55;
+}
+.meet-box .meet-label strong{color:var(--gold-soft); font-style:normal; font-weight:600;}
 
 footer{
   background:var(--navy-deep); color:rgba(255,255,255,0.55);
