@@ -97,11 +97,6 @@ nav.links a:hover, nav.links a.active{border-color:var(--gold); color:#fff;}
     url('/images/hero.jpg') center 30%/cover no-repeat;
   color:var(--cream); padding:140px 24px 100px; overflow:hidden;
 }
-.hero::before{
-  content:""; position:absolute; inset:0;
-  background-image:repeating-linear-gradient(135deg, rgba(201,164,56,0.045) 0 2px, transparent 2px 46px);
-  pointer-events:none;
-}
 .hero-inner{position:relative; max-width:720px;}
 .hero .crown{width:64px; height:64px; opacity:0.95;}
 .eyebrow-scripture{
