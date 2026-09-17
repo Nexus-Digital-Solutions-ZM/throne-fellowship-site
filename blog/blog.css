@@ -28,3 +28,5 @@ h1{font-size:2.4rem; color:var(--navy-deep); margin-bottom:10px;}
   background:var(--navy-deep); color:rgba(255,255,255,0.55);
   text-align:center; padding:26px 20px; font-size:0.82rem;
 }
+.blog-footer a{color:var(--gold-soft); text-decoration:none;}
+.blog-footer a:hover{text-decoration:underline;}
