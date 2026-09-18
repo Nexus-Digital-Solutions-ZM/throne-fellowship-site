@@ -54,7 +54,10 @@ const PAGE_HEAD = (title) => `<!DOCTYPE html>
 </header>
 `;
 const PAGE_FOOT = `
-<footer class="blog-footer">Built and maintained by Nexus Digital Solutions</footer>
+<footer class="blog-footer">
+  &copy; 2026 Throne of Families and Nations Fellowship &mdash; Lusaka, Zambia. All rights reserved.<br>
+  Built and maintained by <a href="https://nexus-digital-solution.vercel.app" target="_blank" rel="noopener">Nexus Digital Solutions</a>
+</footer>
 </body>
 </html>
 `;
