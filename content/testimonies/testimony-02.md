@@ -1,6 +1,6 @@
 ---
 name: HON. CLEOPATRA HAMAAMBO
-date: 2026-09-18T12:51:00.000+02:00
+date: 2026-09-07T10:54:00.000+02:00
 image: /images/uploads/whatsapp-image-2026-09-15-at-22.55.34.jpeg
 alt: "Testimony: fibroid disappearing after prayer"
 ---
