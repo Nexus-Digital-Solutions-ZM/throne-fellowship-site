@@ -1,5 +1,5 @@
 ---
-name: Anonymus
+name: ""
 date: 2026-06-01T13:09:00.000+02:00
 image: /images/uploads/whatsapp-image-2026-09-15-at-23.03.48.jpeg
 ---
