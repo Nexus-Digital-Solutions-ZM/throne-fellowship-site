@@ -20,12 +20,12 @@ function walk(dir) {
     if (entry.isDirectory()) {
       if (!SKIP.has(entry.name)) walk(full);
     } else if (entry.name.endsWith(".html")) {
-      process(full);
+      addTag(full);
     }
   }
 }
 
-function process(file) {
+function addTag(file) {
   const html = fs.readFileSync(file, "utf8");
   if (html.includes(ID)) return console.log("already has tag:", file);
   if (!html.includes("</head>")) return console.log("NO </head>, skipped:", file);
