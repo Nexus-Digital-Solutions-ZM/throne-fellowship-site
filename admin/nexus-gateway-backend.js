@@ -59,6 +59,11 @@
   // ---------------------------------------------------------------------
   var sessionToken = null;
   var exchangePromise = null;
+  // The first failed handoff exchange is remembered and re-thrown, so every
+  // later call reports the REAL cause (CORS/network/expired/already used)
+  // instead of the misleading "No Nexus handoff token found" that the
+  // second attempt would otherwise produce once the fragment is consumed.
+  var exchangeError = null;
 
   function readHandoffFragment() {
     // Preferred path: admin/index.html already captured the token before
@@ -106,6 +111,7 @@
    */
   function ensureSession() {
     if (sessionToken) return Promise.resolve(sessionToken);
+    if (exchangeError) return Promise.reject(exchangeError);
     if (exchangePromise) return exchangePromise;
 
     var handoff = readHandoffFragment();
@@ -116,9 +122,24 @@
         )
       );
     }
-    exchangePromise = exchangeHandoffToken(handoff).finally(function () {
-      exchangePromise = null;
-    });
+    exchangePromise = exchangeHandoffToken(handoff)
+      .catch(function (err) {
+        if (err instanceof TypeError) {
+          // fetch() rejects with a TypeError for network failures AND for
+          // CORS blocks; the browser hides which. Say both.
+          err = new Error(
+            "Could not reach the Nexus Gateway (network problem, or the request was blocked by CORS — " +
+              "check this site's website_url on the Gateway matches " +
+              window.location.origin +
+              " exactly)."
+          );
+        }
+        exchangeError = err;
+        throw err;
+      })
+      .finally(function () {
+        exchangePromise = null;
+      });
     return exchangePromise;
   }
 
