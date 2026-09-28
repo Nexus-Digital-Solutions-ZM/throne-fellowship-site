@@ -1,15 +1,19 @@
 backend:
-  name: github
-  repo: Nexus-Digital-Solutions-ZM/throne-fellowship-site
-  branch: main
-  base_url: https://throneoffamiliesandnations.org
-  auth_endpoint: api/auth
+  name: nexus-gateway
 
-# GitHub OAuth backend (Vercel-friendly, no Netlify involved).
-# Set up: create a GitHub OAuth App -> add its Client ID/Secret as Vercel env vars
-# (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET) -> the /api/auth and /api/callback
-# serverless functions in this repo handle the login handshake.
-# base_url must match your live Vercel domain (or custom domain once attached).
+# Custom Decap backend (admin/nexus-gateway-backend.js) that talks to the
+# Nexus CMS Gateway instead of GitHub directly. Auth happens via a
+# one-time handoff link from the Gateway ("Edit this site" button) —
+# there is no login form here. The old GitHub OAuth backend and the
+# /api/auth /api/callback Vercel functions are no longer used by this
+# admin UI (left in place, not deleted, in case anything else depends on
+# them).
+# repo/branch/base_url/auth_endpoint are no longer read by this backend;
+# kept commented for reference only.
+# repo: Nexus-Digital-Solutions-ZM/throne-fellowship-site
+# branch: main
+# base_url: https://throneoffamiliesandnations.org
+# auth_endpoint: api/auth
 
 media_folder: "images/uploads"
 public_folder: "/images/uploads"

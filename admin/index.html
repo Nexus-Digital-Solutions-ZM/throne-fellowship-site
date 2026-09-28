@@ -1,112 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Content Admin — Throne of Families and Nations Fellowship</title>
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #0F1B33;
-      margin: 0;
-    }
-    #cms-loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #0F1B33;
-      color: #E5E9F0;
-      text-align: center;
-      padding: 24px;
-      box-sizing: border-box;
-    }
-    #cms-loading .spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid rgba(255, 255, 255, 0.2);
-      border-top-color: #E5C158;
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin-bottom: 16px;
-    }
-    #cms-loading p {
-      margin: 4px 0;
-      font-size: 15px;
-      opacity: 0.85;
-    }
-    #cms-loading .sub {
-      font-size: 13px;
-      opacity: 0.55;
-    }
-    #cms-loading.error .spinner {
-      display: none;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+  <title>Content Manager | Throne of Families and Nations</title>
 </head>
 <body>
-  <!-- Overlay shown until Decap CMS finishes loading; hidden automatically once it mounts -->
-  <div id="cms-loading">
-    <div class="spinner"></div>
-    <p id="cms-loading-text">Loading admin panel…</p>
-    <p class="sub" id="cms-loading-sub">This can take a little longer on a slow connection.</p>
-  </div>
+  <!--
+    decap-cms.js is the fully-bundled build (React, ReactDOM, widgets and
+    built-in backends are inside it) — do NOT load React separately.
 
+    Step 1 (this inline script, runs BEFORE Decap loads):
+      - Capture the one-time #nexus_handoff token into
+        window.__NEXUS_HANDOFF__ and clear it from the URL. Decap uses
+        hash routing, so if the token is still in the hash when it boots
+        it tries to open the route "#/nexus_handoff=..." and shows
+        "Not Found". Clearing it first means Decap starts on a clean
+        "#/" and goes to the first collection.
+      - Set CMS_MANUAL_INIT so Decap waits for us to register the Nexus
+        Gateway backend before reading config.yml.
+  -->
   <script>
-    // If api/callback.js just handed us a fresh login, write it directly into
-    // the localStorage key Decap CMS checks for an existing session on boot.
-    // This must run BEFORE decap-cms.js loads below, so Decap sees an
-    // already-authenticated session and skips the login screen entirely,
-    // instead of us trying to "catch" a message after the fact.
-    (function() {
-      var pending = sessionStorage.getItem('decap-cms-oauth-pending');
-      if (!pending) return;
-      sessionStorage.removeItem('decap-cms-oauth-pending');
-      try {
-        localStorage.setItem('decap-cms-user', pending);
-      } catch (e) {
-        // If localStorage write fails for any reason, fall through — Decap
-        // will just show its normal login screen instead of crashing.
+    (function () {
+      var m = /(?:^|[#&])\/?nexus_handoff=([^&]+)/.exec(window.location.hash || "");
+      if (m) {
+        window.__NEXUS_HANDOFF__ = decodeURIComponent(m[1]);
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
       }
     })();
-
-    // Hides the loading overlay once the CMS script has actually finished
-    // loading and had a moment to render, so it doesn't sit on top forever.
-    function hideCmsLoading() {
-      var el = document.getElementById('cms-loading');
-      if (el) el.style.display = 'none';
-    }
-
-    // If the script never loads at all (blocked, offline, CDN down), stop
-    // spinning forever and say so instead of hanging silently.
-    function cmsLoadFailed() {
-      var el = document.getElementById('cms-loading');
-      if (!el) return;
-      el.classList.add('error');
-      document.getElementById('cms-loading-text').textContent = 'Couldn\'t load the admin panel.';
-      document.getElementById('cms-loading-sub').textContent = 'Check your connection and reload the page.';
-    }
-
-    // Safety net: if nothing has hidden the overlay within 45s, treat it as failed.
-    var cmsLoadTimeout = setTimeout(cmsLoadFailed, 45000);
+    window.CMS_MANUAL_INIT = true;
   </script>
-
-  <!-- Decap CMS (free, open-source, git-based — no server for Nexus to run).
-       Pinned to an exact version rather than a ^range so the browser hits
-       the file directly, skipping unpkg's extra version-resolution request. -->
-  <script
-    src="https://unpkg.com/decap-cms@3.16.0/dist/decap-cms.js"
-    onload="clearTimeout(cmsLoadTimeout); setTimeout(hideCmsLoading, 300);"
-    onerror="clearTimeout(cmsLoadTimeout); cmsLoadFailed();"
-  ></script>
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script src="nexus-gateway-backend.js"></script>
+  <script>
+    CMS.registerBackend("nexus-gateway", window.NexusGatewayBackend);
+    CMS.init();
+  </script>
 </body>
 </html>
