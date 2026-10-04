@@ -281,3 +281,25 @@ body{overflow-wrap:break-word; word-wrap:break-word;}
 
 /* testimony screenshots vary in height - cap them so cards stay even */
 .testimony-card img{max-height:520px; object-fit:contain; background:var(--navy-deep);}
+
+/* ---- homepage "Latest Updates" (blog preview) ---- */
+.updates-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:36px;}
+.update-card{
+  display:block; min-width:0; text-align:left; text-decoration:none; color:inherit;
+  background:#fff; border-left:3px solid var(--gold); padding:18px;
+  overflow-wrap:anywhere; word-break:break-word;
+}
+.update-card .u-date{font-size:0.78rem; color:#8a7a4a; margin-bottom:6px;}
+.update-card .u-title{font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--navy-deep); margin-bottom:6px; line-height:1.25;}
+.update-card .u-excerpt{
+  font-size:0.9rem; color:#444;
+  display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;
+}
+
+@media (max-width:820px){
+  .updates-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:560px){
+  .updates-grid{grid-template-columns:1fr; margin-top:26px;}
+  .update-card{padding:16px;}
+}

@@ -103,7 +103,7 @@
     <div class="kicker-rule" style="background:var(--gold-soft);"></div>
     <h2 class="section-title" style="color:#fff;">Latest Updates</h2>
     <p class="lede">News and reflections from the fellowship &mdash; read more on our Blog.</p>
-    <div id="latest-updates-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:36px;">
+    <div id="latest-updates-grid" class="updates-grid">
       <div>Loading updates&hellip;</div>
     </div>
     <div style="margin-top:32px;">
@@ -118,10 +118,10 @@
       const grid = document.getElementById('latest-updates-grid');
       if (!posts.length) { grid.innerHTML = '<p>No posts yet &mdash; check back soon.</p>'; return; }
       grid.innerHTML = posts.map(p => `
-        <a href="/blog/posts/${p.slug}.html" style="text-align:left; text-decoration:none; color:inherit; background:#fff; border-left:3px solid var(--gold); padding:18px;">
-          <div style="font-size:0.78rem; color:#8a7a4a; margin-bottom:6px;">${p.date}</div>
-          <div style="font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--navy-deep); margin-bottom:6px;">${p.title}</div>
-          <div style="font-size:0.9rem; color:#444;">${p.excerpt}</div>
+        <a href="/blog/posts/${p.slug}.html" class="update-card">
+          <div class="u-date">${p.date}</div>
+          <div class="u-title">${p.title}</div>
+          <div class="u-excerpt">${p.excerpt}</div>
         </a>`).join('');
     })
     .catch(() => {
