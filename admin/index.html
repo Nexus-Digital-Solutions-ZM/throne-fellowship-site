@@ -3,9 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
   <title>Content Manager | Throne of Families and Nations</title>
 </head>
 <body>
+  <noscript>This content editor needs JavaScript. Please turn it on and reload.</noscript>
   <!--
     decap-cms.js is the fully-bundled build (React, ReactDOM, widgets and
     built-in backends are inside it) — do NOT load React separately.
@@ -19,6 +21,11 @@
         "#/" and goes to the first collection.
       - Set CMS_MANUAL_INIT so Decap waits for us to register the Nexus
         Gateway backend before reading config.yml.
+
+    noindex: this is the private editor, not a public page. If someone
+    copies its address by mistake, search engines should not list it.
+    When there is no sign-in, nexus-gateway-backend.js shows a single
+    "Sign in" panel instead of a blank page.
   -->
   <script>
     (function () {
