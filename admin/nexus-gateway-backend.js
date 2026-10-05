@@ -6,9 +6,10 @@
  * config.yml). Registered as CMS.registerBackend("nexus-gateway", ...).
  *
  * Auth model (see Gateway's lib/auth.ts / cms-guard.ts / handoff-exchange
- * route): this page never logs in on its own. A Nexus admin clicks
- * "Edit this site" in the Gateway's /admin dashboard, which redirects
- * here with a one-time token in the URL FRAGMENT:
+ * route): this page never logs in on its own. An editor signs in at the
+ * Gateway (/login), or a Nexus admin clicks "Edit this site" in the
+ * Gateway's /admin dashboard; either way the Gateway redirects here with
+ * a one-time token in the URL FRAGMENT:
  *   https://throneoffamiliesandnations.org/admin/#nexus_handoff=<jwt>
  *
  * admin/index.html captures that fragment BEFORE Decap boots (into
@@ -19,9 +20,19 @@
  * token and holds it ONLY in memory (a closure variable below) — never
  * localStorage, never sessionStorage, never sent anywhere except as the
  * Authorization: Bearer header on Gateway API calls. Consequence
- * editors should know: refreshing this page loses the session — go back
- * to the Nexus dashboard and click "Edit this site" again. That's a
- * deliberate tradeoff (no token sitting in browser storage), not a bug.
+ * editors should know: refreshing this page loses the session — sign in
+ * again. That's a deliberate tradeoff (no token sitting in browser
+ * storage), not a bug.
+ *
+ * Error handling: when there is no usable session (opened without a
+ * handoff link, link expired/already used, session timed out, signed out,
+ * or the Gateway is unreachable) this file shows ONE full-page panel with a
+ * "Sign in" button instead of Decap's blank page and a pile of identical
+ * red toasts. Every Gateway call made while the session is dead stays
+ * pending (so Decap raises no toast per collection) and the panel is the
+ * only thing the person sees. Other failures (save failed, file too large,
+ * server error) still surface as a single normal Decap toast, with a
+ * plain-English message.
  *
  * Decap 3.19 interface notes (learned the hard way, from runtime errors):
  *   - authComponent() must exist and return a component function.
@@ -64,6 +75,118 @@
   // instead of the misleading "No Nexus handoff token found" that the
   // second attempt would otherwise produce once the fragment is consumed.
   var exchangeError = null;
+  var panelShown = false;
+
+  // ---------------------------------------------------------------------
+  // "No usable session" panel
+  // ---------------------------------------------------------------------
+
+  var PANEL_COPY = {
+    signin: {
+      title: "Sign in to edit this site",
+      body:
+        "This editor opens from a secure sign-in. Sign in with your email and we’ll send you a link that brings you straight back here.",
+    },
+    signedout: {
+      title: "You’re signed out",
+      body: "Sign in again whenever you’re ready to keep editing.",
+    },
+    expired: {
+      title: "Your session has ended",
+      body:
+        "Your sign-in link has expired or was already used, or your session timed out. Sign in again to get back to editing.",
+    },
+    network: {
+      title: "Can’t reach the editing service",
+      body: "Check your internet connection, then sign in again.",
+    },
+  };
+
+  /** Error that means "there is no usable session"; carries which panel to show. */
+  function sessionError(kind, message) {
+    var err = new Error(message);
+    err.nexusKind = kind;
+    return err;
+  }
+
+  function showPanel(kind, detail) {
+    if (panelShown) return;
+    panelShown = true;
+    var copy = PANEL_COPY[kind] || PANEL_COPY.signin;
+
+    function build() {
+      var root = document.createElement("div");
+      root.setAttribute("role", "alertdialog");
+      root.setAttribute("aria-modal", "true");
+      root.setAttribute("aria-labelledby", "nexus-panel-title");
+      root.setAttribute("aria-describedby", "nexus-panel-body");
+      root.style.cssText =
+        "position:fixed;top:0;right:0;bottom:0;left:0;z-index:2147483647;display:flex;" +
+        "align-items:center;justify-content:center;padding:24px;background:#f4f5f7;" +
+        "font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#1f2937;";
+
+      var card = document.createElement("div");
+      card.style.cssText =
+        "max-width:420px;width:100%;background:#fff;border:1px solid #e5e7eb;border-radius:12px;" +
+        "padding:28px 24px;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center;";
+
+      var title = document.createElement("h1");
+      title.id = "nexus-panel-title";
+      title.textContent = copy.title;
+      title.style.cssText = "margin:0 0 10px;font-size:20px;font-weight:600;line-height:1.3;";
+
+      var body = document.createElement("p");
+      body.id = "nexus-panel-body";
+      body.textContent = copy.body;
+      body.style.cssText = "margin:0 0 22px;font-size:15px;line-height:1.5;color:#4b5563;";
+
+      var button = document.createElement("a");
+      button.href = GATEWAY_BASE_URL + "/login";
+      button.textContent = "Sign in";
+      button.style.cssText =
+        "display:inline-block;background:#1f2937;color:#fff;text-decoration:none;font-size:15px;" +
+        "font-weight:500;padding:11px 26px;border-radius:8px;";
+
+      card.appendChild(title);
+      card.appendChild(body);
+      card.appendChild(button);
+
+      if (detail && (kind === "expired" || kind === "network")) {
+        var small = document.createElement("p");
+        small.textContent = "Details: " + detail;
+        small.style.cssText = "margin:20px 0 0;font-size:12px;line-height:1.4;color:#9ca3af;word-break:break-word;";
+        card.appendChild(small);
+      }
+
+      root.appendChild(card);
+      document.body.appendChild(root);
+      try {
+        button.focus();
+      } catch (e) {
+        /* focus is a nicety only */
+      }
+    }
+
+    if (document.body) build();
+    else document.addEventListener("DOMContentLoaded", build);
+  }
+
+  /**
+   * Session failures show the panel and then stay pending forever, so Decap
+   * never raises a toast (let alone one per collection). Anything else is a
+   * normal error and is re-thrown for Decap to report once.
+   */
+  function handleSessionFailure(err) {
+    if (err && err.nexusKind) {
+      showPanel(err.nexusKind, err.message);
+      return new Promise(function () {});
+    }
+    throw err;
+  }
+
+  // ---------------------------------------------------------------------
+  // Session exchange
+  // ---------------------------------------------------------------------
 
   function readHandoffFragment() {
     // Preferred path: admin/index.html already captured the token before
@@ -91,9 +214,12 @@
       body: JSON.stringify({ token: handoffToken }),
     })
       .then(function (res) {
-        return res.json().then(function (data) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
           if (!res.ok) {
-            throw new Error(data.error || "handoff exchange failed (" + res.status + ")");
+            throw sessionError(
+              "expired",
+              (data && data.error) || "handoff exchange failed (" + res.status + ")"
+            );
           }
           return data;
         });
@@ -117,9 +243,7 @@
     var handoff = readHandoffFragment();
     if (!handoff) {
       return Promise.reject(
-        new Error(
-          "No Nexus handoff token found. Go back to the Nexus admin dashboard and click \u201cEdit this site\u201d to get here."
-        )
+        sessionError("signin", "No Nexus handoff token found.")
       );
     }
     exchangePromise = exchangeHandoffToken(handoff)
@@ -127,7 +251,8 @@
         if (err instanceof TypeError) {
           // fetch() rejects with a TypeError for network failures AND for
           // CORS blocks; the browser hides which. Say both.
-          err = new Error(
+          err = sessionError(
+            "network",
             "Could not reach the Nexus Gateway (network problem, or the request was blocked by CORS — " +
               "check this site's website_url on the Gateway matches " +
               window.location.origin +
@@ -145,25 +270,57 @@
 
   function authedFetch(path, options) {
     options = options || {};
-    return ensureSession().then(function (token) {
-      var headers = Object.assign({}, options.headers, {
-        Authorization: "Bearer " + token,
-      });
-      if (options.body && !headers["Content-Type"]) {
-        headers["Content-Type"] = "application/json";
-      }
-      return fetch(API_BASE + path, Object.assign({}, options, { headers: headers }));
-    });
+    return ensureSession()
+      .then(function (token) {
+        var headers = Object.assign({}, options.headers, {
+          Authorization: "Bearer " + token,
+        });
+        if (options.body && !headers["Content-Type"]) {
+          headers["Content-Type"] = "application/json";
+        }
+        return fetch(API_BASE + path, Object.assign({}, options, { headers: headers })).then(
+          function (res) {
+            if (res.status === 401) {
+              // Session expired or was revoked mid-use.
+              sessionToken = null;
+              exchangeError = sessionError("expired", "session no longer valid (401)");
+              throw exchangeError;
+            }
+            return res;
+          },
+          function (err) {
+            if (err instanceof TypeError) {
+              throw new Error("Network problem. Check your connection and try again.");
+            }
+            throw err;
+          }
+        );
+      })
+      .catch(handleSessionFailure);
+  }
+
+  function friendlyError(status, serverMessage, path) {
+    if (status === 403) return "You don’t have permission to do that.";
+    if (status === 413) return "That file is too large to upload.";
+    if (status === 429) return "Too many requests. Wait a moment and try again.";
+    if (status >= 500) return "The editing service had a problem. Try again in a moment.";
+    if (typeof serverMessage === "string" && serverMessage) return serverMessage;
+    return "Request failed (" + status + ") for " + path;
   }
 
   function authedJson(path, options) {
     return authedFetch(path, options).then(function (res) {
-      return res.json().then(function (data) {
-        if (!res.ok) {
-          throw new Error(data.error || "Gateway request failed (" + res.status + ") for " + path);
-        }
-        return data;
-      });
+      return res
+        .json()
+        .catch(function () {
+          return {};
+        })
+        .then(function (data) {
+          if (!res.ok) {
+            throw new Error(friendlyError(res.status, data && data.error, path));
+          }
+          return data;
+        });
     });
   }
 
@@ -266,13 +423,28 @@
   };
 
   NexusGatewayBackend.prototype.authenticate = function () {
-    return ensureSession().then(function () {
-      return { name: "Nexus Editor", login: "nexus-editor" };
-    });
+    return ensureSession()
+      .then(function () {
+        return { name: "Nexus Editor", login: "nexus-editor" };
+      })
+      .catch(handleSessionFailure);
   };
 
   NexusGatewayBackend.prototype.logout = function () {
+    var token = sessionToken;
     sessionToken = null;
+    if (token) {
+      // Best effort: also end the session on the Gateway, not just here.
+      try {
+        fetch(GATEWAY_BASE_URL + "/api/logout", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + token, Accept: "application/json" },
+        }).catch(function () {});
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    showPanel("signedout");
     return Promise.resolve();
   };
 
