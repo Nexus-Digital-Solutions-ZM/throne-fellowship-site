@@ -100,6 +100,11 @@
       title: "Can’t reach the editing service",
       body: "Check your internet connection, then sign in again.",
     },
+    paused: {
+      title: "Editing is paused for this account",
+      body:
+        "The Nexus team has paused access for this client. Your content is safe \u2014 contact the Nexus team to have editing restored.",
+    },
   };
 
   /** Error that means "there is no usable session"; carries which panel to show. */
@@ -216,6 +221,9 @@
       .then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (data) {
           if (!res.ok) {
+            if (res.status === 403 && data && data.code === "ACCESS_PAUSED") {
+              throw sessionError("paused", data.error || "Access paused by the Nexus team.");
+            }
             throw sessionError(
               "expired",
               (data && data.error) || "handoff exchange failed (" + res.status + ")"
@@ -285,6 +293,27 @@
               sessionToken = null;
               exchangeError = sessionError("expired", "session no longer valid (401)");
               throw exchangeError;
+            }
+            if (res.status === 403) {
+              // Non-destructive peek: the caller still needs the body if
+              // this turns out NOT to be a pause.
+              return res
+                .clone()
+                .json()
+                .catch(function () {
+                  return {};
+                })
+                .then(function (data) {
+                  if (data && data.code === "ACCESS_PAUSED") {
+                    sessionToken = null;
+                    exchangeError = sessionError(
+                      "paused",
+                      data.error || "Access paused by the Nexus team."
+                    );
+                    throw exchangeError;
+                  }
+                  return res;
+                });
             }
             return res;
           },
