@@ -17,12 +17,12 @@
  * router starts on a clean "#/" and never tries to route to
  * "#/nexus_handoff=..." (which rendered "Not Found"). This file then
  * exchanges the token via POST /handoff-exchange for a real session
- * token and holds it ONLY in memory (a closure variable below) — never
- * localStorage, never sessionStorage, never sent anywhere except as the
- * Authorization: Bearer header on Gateway API calls. Consequence
- * editors should know: refreshing this page loses the session — sign in
- * again. That's a deliberate tradeoff (no token sitting in browser
- * storage), not a bug.
+ * token and holds it in sessionStorage, so a page refresh keeps the
+ * editor signed in but closing the tab (or the whole browser) signs
+ * them out — never localStorage, never a cookie. Never sent anywhere
+ * except as the Authorization: Bearer header on Gateway API calls.
+ * sessionStorage is per-tab by design, so a second tab does not inherit
+ * the session; the editor signs in there independently.
  *
  * Error handling: when there is no usable session (opened without a
  * handoff link, link expired/already used, session timed out, signed out,
@@ -65,10 +65,36 @@
   var API_BASE = GATEWAY_BASE_URL + "/api/cms/" + GATEWAY_CLIENT_ID;
 
   // ---------------------------------------------------------------------
-  // In-memory-only session state. Deliberately not persisted anywhere —
-  // see file doc comment above.
+  // Session token, held in sessionStorage rather than a plain closure
+  // variable so a page refresh keeps the editor signed in, but closing
+  // the tab (or the whole browser) signs them out — the same lifetime a
+  // normal in-memory variable has, extended across one reload. NOT
+  // localStorage: that would outlive the tab and the browser restart.
+  // NOT a cookie: the cookie the Gateway sets on its own domain is not
+  // readable from a client site's origin anyway (see file doc comment).
   // ---------------------------------------------------------------------
-  var sessionToken = null;
+  var SESSION_STORAGE_KEY = "nexus_session_token";
+
+  function readStoredToken() {
+    try {
+      return window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+    } catch (e) {
+      // sessionStorage can throw in some privacy modes; fall back to memory.
+      return null;
+    }
+  }
+
+  function writeStoredToken(token) {
+    try {
+      if (token) window.sessionStorage.setItem(SESSION_STORAGE_KEY, token);
+      else window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
+    } catch (e) {
+      /* memory-only is fine; the tab keeps working until it closes */
+    }
+  }
+
+  var sessionToken = readStoredToken();
+
   var exchangePromise = null;
   // The first failed handoff exchange is remembered and re-thrown, so every
   // later call reports the REAL cause (CORS/network/expired/already used)
@@ -234,6 +260,7 @@
       })
       .then(function (data) {
         sessionToken = data.token;
+        writeStoredToken(sessionToken);
         return sessionToken;
       });
   }
@@ -291,6 +318,7 @@
             if (res.status === 401) {
               // Session expired or was revoked mid-use.
               sessionToken = null;
+              writeStoredToken(null);
               exchangeError = sessionError("expired", "session no longer valid (401)");
               throw exchangeError;
             }
@@ -306,6 +334,7 @@
                 .then(function (data) {
                   if (data && data.code === "ACCESS_PAUSED") {
                     sessionToken = null;
+                    writeStoredToken(null);
                     exchangeError = sessionError(
                       "paused",
                       data.error || "Access paused by the Nexus team."
@@ -462,6 +491,7 @@
   NexusGatewayBackend.prototype.logout = function () {
     var token = sessionToken;
     sessionToken = null;
+    writeStoredToken(null);
     if (token) {
       // Best effort: also end the session on the Gateway, not just here.
       try {
