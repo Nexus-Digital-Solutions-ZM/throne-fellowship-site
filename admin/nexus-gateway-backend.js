@@ -34,6 +34,13 @@
  * server error) still surface as a single normal Decap toast, with a
  * plain-English message.
  *
+ * Pause handling: if the Gateway answers 403 with `code: "ACCESS_PAUSED"`
+ * (see guardCmsRequest in the Gateway's lib/cms-guard.ts), the same
+ * full-page panel appears with the "contact the Nexus team" message —
+ * NOT Decap's generic "You don't have permission to do that" toast, and
+ * NOT "Failed to fetch". This covers both an individual editor's
+ * `disabled` flag and a client-wide `suspended` flag.
+ *
  * Decap 3.19 interface notes (learned the hard way, from runtime errors):
  *   - authComponent() must exist and return a component function.
  *   - config/collection objects are plain objects, not Immutable Maps.
@@ -439,9 +446,13 @@
   function NexusGatewayBackend(config, options) {
     this.config = config;
     this.options = options || {};
-    ensureSession().catch(function (err) {
-      console.error("[nexus-gateway-backend] handoff exchange failed:", err);
-    });
+    // Deliberately do NOT eagerly call ensureSession() here. On a plain
+    // page reload (no handoff fragment in the URL) that call rejects with
+    // "No Nexus handoff token found", and Decap interprets the rejection
+    // as "not logged in" — triggering its logout path and wiping the
+    // sessionStorage token before restoreUser() below can use it. Decap
+    // calls restoreUser()/authenticate() on its own shortly after
+    // construction; that is where session resolution belongs.
   }
 
   NexusGatewayBackend.prototype.isGitBackend = function () {
@@ -474,9 +485,18 @@
     };
   };
 
-  // We never persist the user, so Decap always ends up calling
-  // authenticate() on load instead of skipping straight to "logged in".
+  /**
+   * restoreUser — Decap asks this first on every page load. If a session
+   * token survived in sessionStorage (i.e. this is a refresh of a tab
+   * that was already signed in), report the user as restored so Decap
+   * skips authenticate() and never enters its logout path. Otherwise
+   * reject, which is Decap's cue to call authenticate() (which will
+   * either use a fresh handoff fragment or show the sign-in panel).
+   */
   NexusGatewayBackend.prototype.restoreUser = function () {
+    if (sessionToken) {
+      return Promise.resolve({ name: "Nexus Editor", login: "nexus-editor" });
+    }
     return Promise.reject(new Error("no persisted Nexus session"));
   };
 
@@ -488,21 +508,18 @@
       .catch(handleSessionFailure);
   };
 
+  /**
+   * logout — clears the in-memory token and the sessionStorage copy, then
+   * shows the "signed out" panel. Deliberately does NOT POST to
+   * /api/logout on the Gateway: that route lives on the Gateway's origin
+   * and would need its own CORS setup, and the server-side session token
+   * is single-use + short-lived anyway, so it will expire on its own.
+   * Removing that call eliminates a cross-origin request that only ever
+   * produced CORS noise.
+   */
   NexusGatewayBackend.prototype.logout = function () {
-    var token = sessionToken;
     sessionToken = null;
     writeStoredToken(null);
-    if (token) {
-      // Best effort: also end the session on the Gateway, not just here.
-      try {
-        fetch(GATEWAY_BASE_URL + "/api/logout", {
-          method: "POST",
-          headers: { Authorization: "Bearer " + token, Accept: "application/json" },
-        }).catch(function () {});
-      } catch (e) {
-        /* ignore */
-      }
-    }
     showPanel("signedout");
     return Promise.resolve();
   };
